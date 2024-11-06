@@ -1,13 +1,16 @@
-import {DayWeather} from "@/app/types/dataTypes";
+import {DayWeather} from "@/types/dataTypes";
 import {fetchWeatherApi} from "openmeteo";
+import {NextRequest, NextResponse} from "next/server";
 
-export async function fetchWeatherData(startDate: Date, endDate: Date) {
-    let data: DayWeather[] = [];
+export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+
+    const data: DayWeather[] = [];
     const params = {
         "latitude": 50.2667,
         "longitude": 24.4333,
-        "start_date": startDate.toISOString().split('T')[0],
-        "end_date": endDate.toISOString().split('T')[0],
+        "start_date": searchParams.get('start_date'),
+        "end_date": searchParams.get('end_date'),
         "daily": ["temperature_2m_max", "temperature_2m_min"]
     };
     const url = "https://historical-forecast-api.open-meteo.com/v1/forecast";
@@ -42,27 +45,5 @@ export async function fetchWeatherData(startDate: Date, endDate: Date) {
         })
     }
 
-    return data;
-}
-
-export function ValidateDateInput(startDate: Date, endDate: Date, lastStartDate: Date, lastEndDate: Date): boolean {
-    // const todayDate = (new Date).getDate()
-    // const parsedEndDate = endDate.getDate()
-    // const parsedStartDate = startDate.getDate()
-    // const parsedLastEndDate = lastEndDate.getDate()
-    // const parsedLastStartDate = lastStartDate.getDate()
-    //
-    // if (parsedEndDate == parsedLastEndDate) {
-    //     return false
-    // }
-    //
-    // if (parsedEndDate > todayDate) {
-    //     return false
-    // }
-    //
-    // if (parsedStartDate > parsedEndDate) {
-    //     return false
-    // }
-
-    return true
+    return NextResponse.json(data)
 }
